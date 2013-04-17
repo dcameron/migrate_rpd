@@ -1,0 +1,13 @@
+name = "Migrate FSRIO Research Projects Database"
+description = "Migrates FSRIO Research Projects Database content to Drupal 7"
+package = "FSRIO"
+core = 7.x
+
+dependencies[] = list
+dependencies[] = migrate
+dependencies[] = number
+dependencies[] = options
+dependencies[] = text
+
+files[] = migrate_rpd.migrate.inc
+files[] = project.inc

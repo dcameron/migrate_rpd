@@ -99,6 +99,8 @@ class RPDFSCategoryMigration extends Migration {
     $this->addFieldMapping('name', 'CATEGORY_NAME')
       ->callbacks('html_entity_decode');
     $this->addFieldMapping('description', 'CATEGORY_DESCRIPTION');
+    $this->addFieldMapping('format')
+      ->defaultValue('filtered_html');
     $this->addFieldMapping('rpd_fscat_keywords', 'KEYWORDS')
       ->arguments(array('format' => 'plain_text'))
       ->defaultValue('');
@@ -134,6 +136,10 @@ class RPDF2TCategoryMigration extends Migration {
 
     // Add field mappings.
     $this->addFieldMapping('name', 'name');
+    $this->addFieldMapping('description')
+      ->defaultValue('');
+    $this->addFieldMapping('format')
+      ->defaultValue('filtered_html');
   }
 }
 
@@ -163,6 +169,10 @@ class RPDJIFSRCategoryMigration extends Migration {
 
     // Add field mappings.
     $this->addFieldMapping('name', 'CATEGORY_NAME');
+    $this->addFieldMapping('description')
+      ->defaultValue('');
+    $this->addFieldMapping('format')
+      ->defaultValue('filtered_html');
   }
 }
 

@@ -11,7 +11,7 @@ class RPDProjectMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
     $query = db_select('project', 'p')
-      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE'))
+      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'JIFSR_CATEGORIES', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE'))
       // @todo Remove the query range which limits the number of records during
       // testing.
       ->range(0, 250);
@@ -25,6 +25,7 @@ class RPDProjectMigration extends Migration {
           'type' => 'int',
           'unsigned' => TRUE,
           'not null' => TRUE,
+          'alias' => 'p',
         ),
       ),
       MigrateDestinationNode::getKeySchema()
@@ -36,6 +37,10 @@ class RPDProjectMigration extends Migration {
     $this->addFieldMapping('rpd_start_date', 'PROJECT_START_DATE');
     $this->addFieldMapping('rpd_end_date', 'PROJECT_END_DATE');
     $this->addFieldMapping('rpd_funding', 'PROJECT_FUNDING');
+    $this->addFieldMapping('rpd_jifsrcats', 'JIFSR_CATEGORIES')
+      ->arguments(array('source_type' => 'tid'))
+      ->sourceMigration('RPDJIFSRCategory')
+      ->defaultValue(0);
     $this->addFieldMapping('rpd_keywords', 'PROJECT_KEYWORDS')
       ->arguments(array('format' => 'plain_text'))
       ->defaultValue('');

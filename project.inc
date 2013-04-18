@@ -127,3 +127,32 @@ class RPDF2TCategoryMigration extends Migration {
     $this->addFieldMapping('name', 'name');
   }
 }
+
+/**
+ * Migrates records from the jifsrcategory table into JIFSR category terms.
+ */
+class RPDJIFSRCategoryMigration extends Migration {
+  public function __construct() {
+    parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $query = db_select('jifsrcategory', 'c')
+      ->fields('c', array('ID', 'CATEGORY_NAME'))
+      ->orderBy('ID', 'ASC');
+    $this->source = new MigrateSourceSQL($query);
+    $this->destination = new MigrateDestinationTerm('rpd_jifsr_categories');
+
+    // Instantiate the MigrateMap
+    $this->map = new MigrateSQLMap($this->machineName,
+      array(
+        'ID' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+      ),
+      MigrateDestinationTerm::getKeySchema()
+    );
+
+    // Add field mappings.
+    $this->addFieldMapping('name', 'CATEGORY_NAME');
+  }
+}

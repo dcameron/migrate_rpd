@@ -12,6 +12,7 @@ function migrate_rpd_migrate_api() {
     'api' => 2,
     'migrations' => array(
       'RPDProject' => array('class_name' => 'RPDProjectMigration'),
+      'RPDFSCategory' => array('class_name' => 'RPDFSCategoryMigration'),
     ),
   );
   return $api;

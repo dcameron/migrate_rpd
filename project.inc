@@ -61,3 +61,41 @@ class RPDProjectMigration extends Migration {
       ->defaultValue('');
   }
 }
+
+/**
+ * Migrates records from the category table into Food safety category terms.
+ */
+class RPDFSCategoryMigration extends Migration {
+  public function __construct() {
+    parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $query = db_select('category', 'c')
+      ->fields('c', array('ID', 'CATEGORY_NAME', 'KEYWORDS', 'IDENTIFIERS', 'CATEGORY_DESCRIPTION'))
+      ->orderBy('ID', 'ASC');
+    $this->source = new MigrateSourceSQL($query);
+    $this->destination = new MigrateDestinationTerm('rpd_food_safety_categories');
+
+    // Instantiate the MigrateMap
+    $this->map = new MigrateSQLMap($this->machineName,
+      array(
+        'ID' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+      ),
+      MigrateDestinationTerm::getKeySchema()
+    );
+
+    // Add field mappings.
+    $this->addFieldMapping('name', 'CATEGORY_NAME')
+      ->callbacks('html_entity_decode');
+    $this->addFieldMapping('description', 'CATEGORY_DESCRIPTION');
+    $this->addFieldMapping('rpd_fscat_keywords', 'KEYWORDS')
+      ->arguments(array('format' => 'plain_text'))
+      ->defaultValue('');
+    $this->addFieldMapping('rpd_fscat_identifiers', 'IDENTIFIERS')
+      ->arguments(array('format' => 'plain_text'))
+      ->defaultValue('');
+  }
+}
+

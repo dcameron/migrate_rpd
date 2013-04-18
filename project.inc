@@ -99,3 +99,31 @@ class RPDFSCategoryMigration extends Migration {
   }
 }
 
+/**
+ * Migrates records from the farm_to_table_categories table into terms.
+ */
+class RPDF2TCategoryMigration extends Migration {
+  public function __construct() {
+    parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $query = db_select('farm_to_table_categories', 'c')
+      ->fields('c', array('cid', 'name'))
+      ->orderBy('cid', 'ASC');
+    $this->source = new MigrateSourceSQL($query);
+    $this->destination = new MigrateDestinationTerm('rpd_farm_to_table_categories');
+
+    // Instantiate the MigrateMap
+    $this->map = new MigrateSQLMap($this->machineName,
+      array(
+        'cid' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+      ),
+      MigrateDestinationTerm::getKeySchema()
+    );
+
+    // Add field mappings.
+    $this->addFieldMapping('name', 'name');
+  }
+}

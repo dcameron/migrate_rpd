@@ -13,6 +13,7 @@ function migrate_rpd_migrate_api() {
     'migrations' => array(
       'RPDProject' => array('class_name' => 'RPDProjectMigration'),
       'RPDFSCategory' => array('class_name' => 'RPDFSCategoryMigration'),
+      'RPDF2TCategory' => array('class_name' => 'RPDF2TCategoryMigration'),
     ),
   );
   return $api;

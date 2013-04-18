@@ -63,13 +63,11 @@ class RPDProjectMigration extends Migration {
       ->defaultValue('');
     $this->addFieldMapping('body:format')
       ->defaultValue('filtered_html');
-    $this->addFieldMapping('created', 'DATE_ENTERED')
-      ->callbacks('strtotime');
+    $this->addFieldMapping('created', 'DATE_ENTERED');
     $this->addFieldMapping('rpd_comments', 'COMMENTS')
       ->arguments(array('format' => 'plain_text'))
       ->defaultValue('');
-    $this->addFieldMapping('changed', 'LAST_UPDATE')
-      ->callbacks('strtotime');
+    $this->addFieldMapping('changed', 'LAST_UPDATE');
   }
 }
 

@@ -165,3 +165,35 @@ class RPDJIFSRCategoryMigration extends Migration {
     $this->addFieldMapping('name', 'CATEGORY_NAME');
   }
 }
+
+/**
+ * Migrates records from the projecttype table into Project type terms.
+ */
+class RPDProjectTypeMigration extends Migration {
+  public function __construct() {
+    parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $query = db_select('projecttype', 't')
+      ->fields('t', array('ID', 'NAME', 'COMMENTS'))
+      ->orderBy('ID', 'ASC');
+    $this->source = new MigrateSourceSQL($query);
+    $this->destination = new MigrateDestinationTerm('rpd_project_types');
+
+    // Instantiate the MigrateMap
+    $this->map = new MigrateSQLMap($this->machineName,
+      array(
+        'ID' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+      ),
+      MigrateDestinationTerm::getKeySchema()
+    );
+
+    // Add field mappings.
+    $this->addFieldMapping('name', 'NAME');
+    $this->addFieldMapping('description', 'COMMENTS');
+    $this->addFieldMapping('format')
+      ->defaultValue('filtered_html');
+  }
+}

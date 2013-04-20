@@ -11,7 +11,7 @@ class RPDProjectMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
     $query = db_select('project', 'p')
-      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'FSRIO_CATEGORIES', 'JIFSR_CATEGORIES', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE'))
+      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'FSRIO_CATEGORIES', 'JIFSR_CATEGORIES', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE'))
       // @todo Remove the query range which limits the number of records during
       // testing.
       ->range(0, 250);
@@ -74,6 +74,9 @@ class RPDProjectMigration extends Migration {
       ->defaultValue('')
       ->callbacks('html_entity_decode');
     $this->addFieldMapping('body:summary')
+      ->defaultValue('');
+    $this->addFieldMapping('rpd_accession_number', 'PROJECT_ACCESSION_NUMBER')
+      ->arguments(array('format' => 'plain_text'))
       ->defaultValue('');
     $this->addFieldMapping('body:format')
       ->defaultValue('filtered_html');

@@ -58,22 +58,23 @@ class RPDProjectMigration extends Migration {
       ->arguments(array('format' => 'plain_text'))
       ->defaultValue('');
     $this->addFieldMapping('rpd_abstract', 'PROJECT_ABSTRACT')
-      ->defaultValue('');
+      ->defaultValue('')
+      ->callbacks('html_entity_decode', 'utf8_encode');
     $this->addFieldMapping('rpd_abstract:format')
       ->defaultValue('filtered_html');
     $this->addFieldMapping('rpd_publications', 'PROJECT_PUBLICATIONS')
       ->defaultValue('')
-      ->callbacks('html_entity_decode');
+      ->callbacks('html_entity_decode', 'utf8_encode');
     $this->addFieldMapping('rpd_publications:format')
       ->defaultValue('filtered_html');
     $this->addFieldMapping('rpd_more_info', 'PROJECT_MORE_INFO')
       ->defaultValue('')
-      ->callbacks('html_entity_decode');
+      ->callbacks('html_entity_decode', 'utf8_encode');
     $this->addFieldMapping('rpd_more_info:format')
       ->defaultValue('filtered_html');
     $this->addFieldMapping('body', 'PROJECT_OBJECTIVE')
       ->defaultValue('')
-      ->callbacks('html_entity_decode');
+      ->callbacks('html_entity_decode', 'utf8_encode');
     $this->addFieldMapping('body:summary')
       ->defaultValue('');
     $this->addFieldMapping('rpd_accession_number', 'PROJECT_ACCESSION_NUMBER')

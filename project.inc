@@ -64,7 +64,7 @@ class RPDProjectMigration extends Migration {
       ->defaultValue('filtered_html');
     $this->addFieldMapping('rpd_publications', 'PROJECT_PUBLICATIONS')
       ->defaultValue('')
-      ->callbacks('html_entity_decode', 'utf8_encode');
+      ->callbacks(array($this, 'splitPublications'));
     $this->addFieldMapping('rpd_publications:format')
       ->defaultValue('filtered_html');
     $this->addFieldMapping('rpd_more_info', 'PROJECT_MORE_INFO')
@@ -90,6 +90,24 @@ class RPDProjectMigration extends Migration {
       ->defaultValue('');
     $this->addFieldMapping('changed', 'LAST_UPDATE')
       ->callbacks('strtotime');
+  }
+
+  /**
+   * Splits source publication fields into multiple values.
+   *
+   * @param string $source
+   *   A field value from the source table record.
+   * @return array
+   *   A formatted, exploded array of strings derived from the source field.
+   */
+  protected function splitPublications($source) {
+    // Decode the HTML entities in the source string.
+    $html_decoded = html_entity_decode($source);
+    // Encode the strings as UTF8 to prevent insert errors due to text encoding.
+    $utf8_encoded = utf8_encode($html_decoded);
+    $values = explode('<P>', $utf8_encoded);
+    // Filter any empty values in the array before returning.
+    return array_filter($values);
   }
 }
 

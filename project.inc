@@ -97,7 +97,7 @@ class RPDFSCategoryMigration extends Migration {
     $this->source = new MigrateSourceSQL($query);
     $this->destination = new MigrateDestinationTerm('rpd_food_safety_categories');
 
-    // Instantiate the MigrateMap
+    // Instantiate the MigrateMap.
     $this->map = new MigrateSQLMap($this->machineName,
       array(
         'ID' => array(
@@ -136,7 +136,7 @@ class RPDF2TCategoryMigration extends Migration {
     $this->source = new MigrateSourceSQL($query);
     $this->destination = new MigrateDestinationTerm('rpd_farm_to_table_categories');
 
-    // Instantiate the MigrateMap
+    // Instantiate the MigrateMap.
     $this->map = new MigrateSQLMap($this->machineName,
       array(
         'cid' => array(
@@ -169,7 +169,7 @@ class RPDJIFSRCategoryMigration extends Migration {
     $this->source = new MigrateSourceSQL($query);
     $this->destination = new MigrateDestinationTerm('rpd_jifsr_categories');
 
-    // Instantiate the MigrateMap
+    // Instantiate the MigrateMap.
     $this->map = new MigrateSQLMap($this->machineName,
       array(
         'ID' => array(
@@ -202,7 +202,7 @@ class RPDProjectTypeMigration extends Migration {
     $this->source = new MigrateSourceSQL($query);
     $this->destination = new MigrateDestinationTerm('rpd_project_types');
 
-    // Instantiate the MigrateMap
+    // Instantiate the MigrateMap.
     $this->map = new MigrateSQLMap($this->machineName,
       array(
         'ID' => array(

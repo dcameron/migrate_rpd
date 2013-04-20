@@ -33,7 +33,8 @@ class RPDProjectMigration extends Migration {
 
     // Add field mappings.
     $this->addFieldMapping('title', 'PROJECT_TITLE');
-    $this->addFieldMapping('rpd_project_number', 'PROJECT_NUMBER');
+    $this->addFieldMapping('rpd_project_number', 'PROJECT_NUMBER')
+      ->arguments(array('format' => 'plain_text'));
     $this->addFieldMapping('rpd_start_date', 'PROJECT_START_DATE');
     $this->addFieldMapping('rpd_end_date', 'PROJECT_END_DATE');
     $this->addFieldMapping('rpd_funding', 'PROJECT_FUNDING');

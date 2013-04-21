@@ -11,13 +11,13 @@ class RPDProjectMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
     $query = db_select('project', 'p')
-      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'FSRIO_CATEGORIES', 'JIFSR_CATEGORIES', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'ACTIVITY_STATUS', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE'));
+      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'FSRIO_CATEGORIES', 'JIFSR_CATEGORIES', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_COOPORATORS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'ACTIVITY_STATUS', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE'));
     // Create a comma-separated list of related farm-to-table cids.
     $query->leftJoin('project_farm_to_table', 'f', 'p.ID = f.pid');
     $query->groupBy('f.pid');
     $query->addExpression('GROUP_CONCAT(f.cid)', 'farm_to_table');
-      // @todo Remove the query range which limits the number of records during
-      // testing.
+    // @todo Remove the query range which limits the number of records during
+    // testing.
     $query->range(0, 250);
     $this->source = new MigrateSourceSQL($query);
     $this->destination = new MigrateDestinationNode('research_project');
@@ -61,6 +61,10 @@ class RPDProjectMigration extends Migration {
     $this->addFieldMapping('rpd_identifiers', 'PROJECT_IDENTIFIERS')
       ->arguments(array('format' => 'plain_text'))
       ->defaultValue('');
+    $this->addFieldMapping('rpd_cooperators', 'PROJECT_COOPORATORS')
+      ->arguments(array('format' => 'plain_text'))
+      ->defaultValue('')
+      ->callbacks(array($this, 'splitCooperators'));
     $this->addFieldMapping('rpd_abstract', 'PROJECT_ABSTRACT')
       ->defaultValue('')
       ->callbacks('html_entity_decode', 'utf8_encode');
@@ -98,6 +102,30 @@ class RPDProjectMigration extends Migration {
       ->separator(',')
       ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDF2TCategory');
+  }
+
+  /**
+   * Splits source cooperator fields into multiple values.
+   *
+   * @param string $source
+   *   A field value from the source table record.
+   * @return array
+   *   A formatted, exploded array of strings derived from the source field.
+   */
+  protected function splitCooperators($source) {
+    // Decode the HTML entities in the source string.
+    $html_decoded = html_entity_decode($source);
+    // Encode the strings as UTF8 to prevent insert errors due to text encoding.
+    $utf8_encoded = utf8_encode($html_decoded);
+    // Convert HTML entities to separator characters.
+    $replaced = str_replace(array('<BR>', '<LI>', '<li>'), '|', $utf8_encoded);
+    // Strip all remaining HTML tags.
+    $stripped = strip_tags($replaced);
+    $values = explode('|', $stripped);
+    // Filter any empty values in the array.
+    $trimmed = array_map('trim', $values);
+    // Filter any empty values in the array before returning.
+    return array_filter($trimmed);
   }
 
   /**

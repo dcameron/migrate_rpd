@@ -5,6 +5,7 @@ core = 7.x
 
 dependencies[] = list
 dependencies[] = migrate
+dependencies[] = migrate_extras
 dependencies[] = number
 dependencies[] = options
 dependencies[] = text

@@ -291,7 +291,9 @@ class RPDInstitutionMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
     $query = db_select('institution_data', 'i')
-      ->fields('i', array('ID', 'INSTITUTION_NAME', 'INSTITUTION_DEPARTMENT', 'INSTITUTION_ADDRESS1', 'INSTITUTION_ADDRESS2', 'INSTITUTION_CITY', 'INSTITUTION_COUNTRY', 'INSTITUTION_STATE', 'INSTITUTION_ZIP', 'INSTITUTION_URL'))
+      ->fields('i', array('ID', 'INSTITUTION_NAME', 'INSTITUTION_DEPARTMENT', 'INSTITUTION_ADDRESS1', 'INSTITUTION_ADDRESS2', 'INSTITUTION_CITY', 'INSTITUTION_COUNTRY', 'INSTITUTION_STATE', 'INSTITUTION_ZIP', 'INSTITUTION_URL'));
+    $query->leftJoin('states', 's', 'i.INSTITUTION_STATE = s.id');
+    $query->fields('s', array('abbrv'))
       ->orderBy('ID', 'ASC')
       // @todo Remove the query range which limits the number of records during
       // testing.
@@ -306,6 +308,7 @@ class RPDInstitutionMigration extends Migration {
           'type' => 'int',
           'unsigned' => TRUE,
           'not null' => TRUE,
+          'alias' => 'i',
         ),
       ),
       MigrateDestinationTerm::getKeySchema()
@@ -313,6 +316,17 @@ class RPDInstitutionMigration extends Migration {
 
     // Add field mappings.
     $this->addFieldMapping('name', 'INSTITUTION_NAME');
+    $arguments = array(
+      'organisation_name' => array('source_field' => 'INSTITUTION_DEPARTMENT'),
+      'thoroughfare' => array('source_field' => 'INSTITUTION_ADDRESS1'),
+      'premise' => array('source_field' => 'INSTITUTION_ADDRESS2'),
+      'locality' => array('source_field' => 'INSTITUTION_CITY'),
+      'administrative_area' => array('source_field' => 'abbrv'),
+      'postal_code' => array('source_field' => 'INSTITUTION_ZIP'),
+    );
+    $this->addFieldMapping('rpd_inst_address')
+      ->defaultValue('US')
+      ->arguments($arguments);
     $this->addFieldMapping('rpd_inst_url', 'INSTITUTION_URL');
     $this->addFieldMapping('rpd_inst_url:title')
       ->defaultValue('');

@@ -8,6 +8,7 @@ dependencies[] = migrate
 dependencies[] = number
 dependencies[] = options
 dependencies[] = text
+dependencies[] = views
 
 files[] = migrate_rpd.migrate.inc
 files[] = project.inc

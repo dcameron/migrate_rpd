@@ -283,3 +283,35 @@ class RPDProjectTypeMigration extends Migration {
       ->defaultValue('filtered_html');
   }
 }
+
+/**
+ * Migrates records from the institution_data table into Institution terms.
+ */
+class RPDInstitutionMigration extends Migration {
+  public function __construct() {
+    parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $query = db_select('institution_data', 'i')
+      ->fields('i', array('ID', 'INSTITUTION_NAME'))
+      ->orderBy('ID', 'ASC')
+      // @todo Remove the query range which limits the number of records during
+      // testing.
+      ->range(0, 250);
+    $this->source = new MigrateSourceSQL($query);
+    $this->destination = new MigrateDestinationTerm('rpd_institutions');
+
+    // Instantiate the MigrateMap.
+    $this->map = new MigrateSQLMap($this->machineName,
+      array(
+        'ID' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+      ),
+      MigrateDestinationTerm::getKeySchema()
+    );
+
+    // Add field mappings.
+    $this->addFieldMapping('name', 'INSTITUTION_NAME');
+  }
+}

@@ -11,10 +11,14 @@ class RPDProjectMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
     $query = db_select('project', 'p')
-      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'FSRIO_CATEGORIES', 'JIFSR_CATEGORIES', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'ACTIVITY_STATUS', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE'))
+      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'FSRIO_CATEGORIES', 'JIFSR_CATEGORIES', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'ACTIVITY_STATUS', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE'));
+    // Create a comma-separated list of related farm-to-table cids.
+    $query->leftJoin('project_farm_to_table', 'f', 'p.ID = f.pid');
+    $query->groupBy('f.pid');
+    $query->addExpression('GROUP_CONCAT(f.cid)', 'farm_to_table');
       // @todo Remove the query range which limits the number of records during
       // testing.
-      ->range(0, 250);
+    $query->range(0, 250);
     $this->source = new MigrateSourceSQL($query);
     $this->destination = new MigrateDestinationNode('research_project');
 
@@ -90,6 +94,10 @@ class RPDProjectMigration extends Migration {
       ->defaultValue('');
     $this->addFieldMapping('changed', 'LAST_UPDATE')
       ->callbacks('strtotime');
+    $this->addFieldMapping('rpd_f2tcats', 'farm_to_table')
+      ->separator(',')
+      ->arguments(array('source_type' => 'tid'))
+      ->sourceMigration('RPDF2TCategory');
   }
 
   /**

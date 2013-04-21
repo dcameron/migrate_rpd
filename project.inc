@@ -291,7 +291,7 @@ class RPDInstitutionMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
     $query = db_select('institution_data', 'i')
-      ->fields('i', array('ID', 'INSTITUTION_NAME'))
+      ->fields('i', array('ID', 'INSTITUTION_NAME', 'INSTITUTION_DEPARTMENT', 'INSTITUTION_ADDRESS1', 'INSTITUTION_ADDRESS2', 'INSTITUTION_CITY', 'INSTITUTION_COUNTRY', 'INSTITUTION_STATE', 'INSTITUTION_ZIP', 'INSTITUTION_URL'))
       ->orderBy('ID', 'ASC')
       // @todo Remove the query range which limits the number of records during
       // testing.
@@ -313,5 +313,8 @@ class RPDInstitutionMigration extends Migration {
 
     // Add field mappings.
     $this->addFieldMapping('name', 'INSTITUTION_NAME');
+    $this->addFieldMapping('rpd_inst_url', 'INSTITUTION_URL');
+    $this->addFieldMapping('rpd_inst_url:title')
+      ->defaultValue('');
   }
 }

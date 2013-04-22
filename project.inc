@@ -288,16 +288,20 @@ class RPDProjectTypeMigration extends Migration {
  * Migrates records from the institution_data table into Institution terms.
  */
 class RPDInstitutionMigration extends Migration {
+  /**
+   * An array of country names keyed by their two-letter code.
+   */
+  protected $countries = array();
+
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
     $query = db_select('institution_data', 'i')
-      ->fields('i', array('ID', 'INSTITUTION_NAME', 'INSTITUTION_DEPARTMENT', 'INSTITUTION_ADDRESS1', 'INSTITUTION_ADDRESS2', 'INSTITUTION_CITY', 'INSTITUTION_COUNTRY', 'INSTITUTION_STATE', 'INSTITUTION_ZIP', 'INSTITUTION_URL'));
+      ->fields('i', array('ID', 'INSTITUTION_NAME', 'INSTITUTION_DEPARTMENT', 'INSTITUTION_ADDRESS1', 'INSTITUTION_ADDRESS2', 'INSTITUTION_CITY', 'INSTITUTION_ZIP', 'INSTITUTION_URL'));
     $query->leftJoin('states', 's', 'i.INSTITUTION_STATE = s.id');
-    $query->fields('s', array('abbrv'))
-      ->orderBy('ID', 'ASC')
-      // @todo Remove the query range which limits the number of records during
-      // testing.
-      ->range(0, 250);
+    $query->fields('s', array('abbrv'));
+    $query->leftJoin('countries', 'c', 'i.INSTITUTION_COUNTRY = c.ID');
+    $query->fields('c', array('COUNTRY_NAME'))
+      ->orderBy('ID', 'ASC');
     $this->source = new MigrateSourceSQL($query);
     $this->destination = new MigrateDestinationTerm('rpd_institutions');
 
@@ -314,6 +318,10 @@ class RPDInstitutionMigration extends Migration {
       MigrateDestinationTerm::getKeySchema()
     );
 
+    // Get the country list from the Locale module.
+    require_once DRUPAL_ROOT . '/includes/locale.inc';
+    $this->countries = country_get_list();
+
     // Add field mappings.
     $this->addFieldMapping('name', 'INSTITUTION_NAME');
     $arguments = array(
@@ -324,11 +332,27 @@ class RPDInstitutionMigration extends Migration {
       'administrative_area' => array('source_field' => 'abbrv'),
       'postal_code' => array('source_field' => 'INSTITUTION_ZIP'),
     );
-    $this->addFieldMapping('rpd_inst_address')
-      ->defaultValue('US')
-      ->arguments($arguments);
+    $this->addFieldMapping('rpd_inst_address', 'COUNTRY_NAME')
+      ->arguments($arguments)
+      ->callbacks(array($this, 'getCountryCode'));
     $this->addFieldMapping('rpd_inst_url', 'INSTITUTION_URL');
     $this->addFieldMapping('rpd_inst_url:title')
       ->defaultValue('');
+  }
+
+  /**
+   * Finds a country's two-letter code from its full name.
+   *
+   * @param type $country
+   *   A country's full name.
+   * @return string
+   *   A two-letter country code.
+   */
+  protected function getCountryCode($country) {
+    $key = array_search($country, $this->countries);
+    if ($key !== FALSE) {
+      return $key;
+    }
+    return 'US';
   }
 }

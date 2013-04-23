@@ -8,10 +8,15 @@
  * Migrates records from the project table into Research project nodes.
  */
 class RPDProjectMigration extends Migration {
+  /**
+   * An array of Drupal uids keyed by user name.
+   */
+  protected $users = array();
+
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
     $query = db_select('project', 'p')
-      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'FSRIO_CATEGORIES', 'JIFSR_CATEGORIES', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_COOPORATORS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'ACTIVITY_STATUS', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE'));
+      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'FSRIO_CATEGORIES', 'JIFSR_CATEGORIES', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_COOPORATORS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'ACTIVITY_STATUS', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE', 'LAST_UPDATE_BY'));
     // Create a comma-separated list of related farm-to-table cids.
     $query->leftJoin('project_farm_to_table', 'f', 'p.ID = f.pid');
     $query->groupBy('f.pid');
@@ -35,8 +40,17 @@ class RPDProjectMigration extends Migration {
       MigrateDestinationNode::getKeySchema()
     );
 
+    // Query for the list of users.
+    $results = db_query("SELECT uid, name FROM users WHERE uid > 0");
+    foreach ($results as $result) {
+      $this->users[$result->name] = $result->uid;
+    }
+
     // Add field mappings.
     $this->addFieldMapping('title', 'PROJECT_TITLE');
+    $this->addFieldMapping('uid', 'LAST_UPDATE_BY')
+      ->defaultValue(1)
+      ->callbacks(array($this, 'getUID'));
     $this->addFieldMapping('rpd_project_number', 'PROJECT_NUMBER')
       ->arguments(array('format' => 'plain_text'));
     $this->addFieldMapping('rpd_start_date', 'PROJECT_START_DATE');
@@ -102,6 +116,21 @@ class RPDProjectMigration extends Migration {
       ->separator(',')
       ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDF2TCategory');
+  }
+
+  /**
+   * Returns the uid of a given username.
+   *
+   * @param string $name
+   *   The name of a user.
+   * @return int
+   *   The uid of the user.
+   */
+  protected function getUID($name) {
+    if (isset($this->users[$name])) {
+      return $this->users[$name];
+    }
+    return 1;
   }
 
   /**

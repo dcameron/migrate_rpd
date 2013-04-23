@@ -420,3 +420,120 @@ class RPDInvestigatorMigration extends Migration {
     $this->addFieldMapping('rpd_inv_activity_status', 'ACTIVITY_STATUS');
   }
 }
+
+/**
+ * Migrates records from the agency_data table into US Funding Source terms.
+ */
+class RPDUSFundingSourceMigration extends Migration {
+  public function __construct() {
+    parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $query = db_select('agency_data', 'a')
+      ->fields('a', array('ID', 'AGENCY_FULL_NAME', 'AGENCY_ACRONYM', 'AGENCY_URL'))
+      ->condition('US_GOVT', 1)
+      ->orderBy('ID', 'ASC');
+    $query->leftJoin('agency_hierarchy', 'h', 'a.ID = h.aid');
+    $query->fields('h', array('parent'));
+    $this->source = new MigrateSourceSQL($query);
+    $this->destination = new MigrateDestinationTerm('rpd_funding_sources_us');
+
+    // Instantiate the MigrateMap.
+    $this->map = new MigrateSQLMap($this->machineName,
+      array(
+        'ID' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'alias' => 'a',
+        ),
+      ),
+      MigrateDestinationTerm::getKeySchema()
+    );
+
+    // Add field mappings.
+    $this->addFieldMapping('name', 'AGENCY_FULL_NAME');
+    $this->addFieldMapping('parent', 'parent')
+      ->sourceMigration('RPDUSFundingSource');
+    $this->addFieldMapping('rpd_funding_acronym', 'AGENCY_ACRONYM');
+    $this->addFieldMapping('rpd_funding_url', 'AGENCY_URL');
+    $this->addFieldMapping('rpd_funding_url:title')
+      ->defaultValue('');
+  }
+}
+
+/**
+ * Migrates records from the agency_data table into Intl. Funding Source terms.
+ */
+class RPDIntlFundingSourceMigration extends Migration {
+  public function __construct() {
+    parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $query = db_select('agency_data', 'a')
+      ->fields('a', array('ID', 'AGENCY_FULL_NAME', 'AGENCY_ACRONYM', 'AGENCY_URL'))
+      ->condition('US_GOVT', 2)
+      ->orderBy('ID', 'ASC');
+    $query->leftJoin('agency_hierarchy', 'h', 'a.ID = h.aid');
+    $query->fields('h', array('parent'));
+    $this->source = new MigrateSourceSQL($query);
+    $this->destination = new MigrateDestinationTerm('rpd_funding_sources_international');
+
+    // Instantiate the MigrateMap.
+    $this->map = new MigrateSQLMap($this->machineName,
+      array(
+        'ID' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'alias' => 'a',
+        ),
+      ),
+      MigrateDestinationTerm::getKeySchema()
+    );
+
+    // Add field mappings.
+    $this->addFieldMapping('name', 'AGENCY_FULL_NAME');
+    $this->addFieldMapping('parent', 'parent')
+      ->sourceMigration('RPDIntlFundingSource');
+    $this->addFieldMapping('rpd_funding_acronym', 'AGENCY_ACRONYM');
+    $this->addFieldMapping('rpd_funding_url', 'AGENCY_URL');
+    $this->addFieldMapping('rpd_funding_url:title')
+      ->defaultValue('');
+  }
+}
+
+/**
+ * Migrates records from the agency_data table into State Funding Source terms.
+ */
+class RPDStateFundingSourceMigration extends Migration {
+  public function __construct() {
+    parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $query = db_select('agency_data', 'a')
+      ->fields('a', array('ID', 'AGENCY_FULL_NAME', 'AGENCY_ACRONYM', 'AGENCY_URL'))
+      ->condition('US_GOVT', 0)
+      ->orderBy('ID', 'ASC');
+    $query->leftJoin('agency_hierarchy', 'h', 'a.ID = h.aid');
+    $query->fields('h', array('parent'));
+    $this->source = new MigrateSourceSQL($query);
+    $this->destination = new MigrateDestinationTerm('rpd_funding_sources_state_private');
+
+    // Instantiate the MigrateMap.
+    $this->map = new MigrateSQLMap($this->machineName,
+      array(
+        'ID' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'alias' => 'a',
+        ),
+      ),
+      MigrateDestinationTerm::getKeySchema()
+    );
+
+    // Add field mappings.
+    $this->addFieldMapping('name', 'AGENCY_FULL_NAME');
+    $this->addFieldMapping('parent', 'parent')
+      ->sourceMigration('RPDStateFundingSource');
+    $this->addFieldMapping('rpd_funding_acronym', 'AGENCY_ACRONYM');
+    $this->addFieldMapping('rpd_funding_url', 'AGENCY_URL');
+    $this->addFieldMapping('rpd_funding_url:title')
+      ->defaultValue('');
+  }
+}

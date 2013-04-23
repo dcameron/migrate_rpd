@@ -18,6 +18,9 @@ function migrate_rpd_migrate_api() {
       'RPDProjectType' => array('class_name' => 'RPDProjectTypeMigration'),
       'RPDInstitution' => array('class_name' => 'RPDInstitutionMigration'),
       'RPDInvestigator' => array('class_name' => 'RPDInvestigatorMigration'),
+      'RPDUSFundingSource' => array('class_name' => 'RPDUSFundingSourceMigration'),
+      'RPDIntlFundingSource' => array('class_name' => 'RPDIntlFundingSourceMigration'),
+      'RPDStateFundingSource' => array('class_name' => 'RPDStateFundingSourceMigration'),
     ),
   );
   return $api;

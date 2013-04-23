@@ -385,3 +385,38 @@ class RPDInstitutionMigration extends Migration {
     return 'US';
   }
 }
+
+/**
+ * Migrates records from the investigator_data table into Investigator terms.
+ */
+class RPDInvestigatorMigration extends Migration {
+  public function __construct() {
+    parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $query = db_select('investigator_data', 'i')
+      ->fields('i', array('ID', 'name', 'EMAIL_ADDRESS', 'PHONE_NUMBER', 'INSTITUTION', 'ACTIVITY_STATUS'));
+    $this->source = new MigrateSourceSQL($query);
+    $this->destination = new MigrateDestinationTerm('rpd_investigators');
+
+    // Instantiate the MigrateMap.
+    $this->map = new MigrateSQLMap($this->machineName,
+      array(
+        'ID' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'alias' => 'i',
+        ),
+      ),
+      MigrateDestinationTerm::getKeySchema()
+    );
+
+    // Add field mappings.
+    $this->addFieldMapping('name', 'name');
+    $this->addFieldMapping('rpd_inv_email', 'EMAIL_ADDRESS');
+    $this->addFieldMapping('rpd_inv_phone', 'PHONE_NUMBER');
+    $this->addFieldMapping('rpd_inv_institution', 'INSTITUTION')
+      ->arguments(array('source_type' => 'tid'))
+      ->sourceMigration('RPDInstitution');
+    $this->addFieldMapping('rpd_inv_activity_status', 'ACTIVITY_STATUS');
+  }
+}

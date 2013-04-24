@@ -16,7 +16,7 @@ class RPDProjectMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
     $query = db_select('project', 'p')
-      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'FSRIO_CATEGORIES', 'JIFSR_CATEGORIES', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_COOPORATORS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'ACTIVITY_STATUS', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE', 'LAST_UPDATE_BY'));
+      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'JIFSR_CATEGORIES', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_COOPORATORS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'ACTIVITY_STATUS', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE', 'LAST_UPDATE_BY'));
     // Create a comma-separated list of related farm-to-table cids.
     $query->leftJoin('project_farm_to_table', 'f', 'p.ID = f.pid');
     $query->groupBy('f.pid');
@@ -56,8 +56,7 @@ class RPDProjectMigration extends Migration {
     $this->addFieldMapping('rpd_start_date', 'PROJECT_START_DATE');
     $this->addFieldMapping('rpd_end_date', 'PROJECT_END_DATE');
     $this->addFieldMapping('rpd_funding', 'PROJECT_FUNDING');
-    $this->addFieldMapping('rpd_fscats', 'FSRIO_CATEGORIES')
-      ->separator(',')
+    $this->addFieldMapping('rpd_fscats', 'category')
       ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDFSCategory')
       ->defaultValue(0);
@@ -116,6 +115,15 @@ class RPDProjectMigration extends Migration {
       ->separator(',')
       ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDF2TCategory');
+  }
+
+  public function prepareRow($row) {
+    // Query for the related food safety categories.
+    $row->category = db_select('project_category', 'c')
+      ->fields('c', array('category_id'))
+      ->condition('project_id', $row->ID)
+      ->execute()
+      ->fetchCol();
   }
 
   /**

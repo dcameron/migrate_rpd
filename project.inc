@@ -16,14 +16,10 @@ class RPDProjectMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
     $query = db_select('project', 'p')
-      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'JIFSR_CATEGORIES', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_COOPORATORS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'ACTIVITY_STATUS', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE', 'LAST_UPDATE_BY'));
-    // Create a comma-separated list of related farm-to-table cids.
-    $query->leftJoin('project_farm_to_table', 'f', 'p.ID = f.pid');
-    $query->groupBy('f.pid');
-    $query->addExpression('GROUP_CONCAT(f.cid)', 'farm_to_table');
+      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'JIFSR_CATEGORIES', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_COOPORATORS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'ACTIVITY_STATUS', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE', 'LAST_UPDATE_BY'))
     // @todo Remove the query range which limits the number of records during
     // testing.
-    $query->range(0, 250);
+      ->range(0, 250);
     $this->source = new MigrateSourceSQL($query);
     $this->destination = new MigrateDestinationNode('research_project');
 
@@ -112,16 +108,22 @@ class RPDProjectMigration extends Migration {
     $this->addFieldMapping('changed', 'LAST_UPDATE')
       ->callbacks('strtotime');
     $this->addFieldMapping('rpd_f2tcats', 'farm_to_table')
-      ->separator(',')
       ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDF2TCategory');
   }
 
   public function prepareRow($row) {
-    // Query for the related food safety categories.
+    // Create an array of related food safety categories.
     $row->category = db_select('project_category', 'c')
       ->fields('c', array('category_id'))
       ->condition('project_id', $row->ID)
+      ->execute()
+      ->fetchCol();
+
+    // Create an array of related farm-to-table categories.
+    $row->farm_to_table = db_select('project_farm_to_table', 'f')
+      ->fields('f', array('cid'))
+      ->condition('pid', $row->ID)
       ->execute()
       ->fetchCol();
   }

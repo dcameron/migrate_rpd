@@ -110,6 +110,9 @@ class RPDProjectMigration extends Migration {
     $this->addFieldMapping('rpd_f2tcats', 'farm_to_table')
       ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDF2TCategory');
+    $this->addFieldMapping('rpd_institutions', 'institutions')
+      ->arguments(array('source_type' => 'tid'))
+      ->sourceMigration('RPDInstitution');
   }
 
   public function prepareRow($row) {
@@ -123,6 +126,13 @@ class RPDProjectMigration extends Migration {
     // Create an array of related farm-to-table categories.
     $row->farm_to_table = db_select('project_farm_to_table', 'f')
       ->fields('f', array('cid'))
+      ->condition('pid', $row->ID)
+      ->execute()
+      ->fetchCol();
+
+    // Create an array of related institution categories.
+    $row->institutions = db_select('institution_index', 'i')
+      ->fields('i', array('inst_id'))
       ->condition('pid', $row->ID)
       ->execute()
       ->fetchCol();

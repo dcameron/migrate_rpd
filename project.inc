@@ -113,6 +113,9 @@ class RPDProjectMigration extends Migration {
     $this->addFieldMapping('rpd_institutions', 'institutions')
       ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDInstitution');
+    $this->addFieldMapping('rpd_investigators', 'investigators')
+      ->arguments(array('source_type' => 'tid'))
+      ->sourceMigration('RPDInvestigator');
   }
 
   public function prepareRow($row) {
@@ -133,6 +136,13 @@ class RPDProjectMigration extends Migration {
     // Create an array of related institution categories.
     $row->institutions = db_select('institution_index', 'i')
       ->fields('i', array('inst_id'))
+      ->condition('pid', $row->ID)
+      ->execute()
+      ->fetchCol();
+
+    // Create an array of related investigator categories.
+    $row->investigators = db_select('investigator_index', 'i')
+      ->fields('i', array('inv_id'))
       ->condition('pid', $row->ID)
       ->execute()
       ->fetchCol();

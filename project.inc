@@ -116,6 +116,15 @@ class RPDProjectMigration extends Migration {
     $this->addFieldMapping('rpd_investigators', 'investigators')
       ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDInvestigator');
+    $this->addFieldMapping('rpd_funding_sources_us', 'us_funding_sources')
+      ->arguments(array('source_type' => 'tid'))
+      ->sourceMigration('RPDUSFundingSource');
+    $this->addFieldMapping('rpd_funding_sources_intl', 'intl_funding_sources')
+      ->arguments(array('source_type' => 'tid'))
+      ->sourceMigration('RPDIntlFundingSource');
+    $this->addFieldMapping('rpd_funding_sources_state', 'state_funding_sources')
+      ->arguments(array('source_type' => 'tid'))
+      ->sourceMigration('RPDStateFundingSource');
   }
 
   public function prepareRow($row) {
@@ -145,6 +154,33 @@ class RPDProjectMigration extends Migration {
       ->fields('i', array('inv_id'))
       ->condition('pid', $row->ID)
       ->execute()
+      ->fetchCol();
+
+    // Create an array of related US funding source categories.
+    $query = db_select('agency_index', 'i');
+    $query->join('agency_data', 'a', 'i.aid = a.ID');
+    $query->fields('i', array('aid'))
+      ->condition('pid', $row->ID)
+      ->condition('US_GOVT', 1);
+    $row->us_funding_sources = $query->execute()
+      ->fetchCol();
+
+    // Create an array of related international funding source categories.
+    $query = db_select('agency_index', 'i');
+    $query->join('agency_data', 'a', 'i.aid = a.ID');
+    $query->fields('i', array('aid'))
+      ->condition('pid', $row->ID)
+      ->condition('US_GOVT', 2);
+    $row->intl_funding_sources = $query->execute()
+      ->fetchCol();
+
+    // Create an array of related state/private org. funding source categories.
+    $query = db_select('agency_index', 'i');
+    $query->join('agency_data', 'a', 'i.aid = a.ID');
+    $query->fields('i', array('aid'))
+      ->condition('pid', $row->ID)
+      ->condition('US_GOVT', 0);
+    $row->state_funding_sources = $query->execute()
       ->fetchCol();
   }
 

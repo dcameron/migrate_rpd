@@ -111,10 +111,10 @@ class RPDProjectMigration extends Migration {
       ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDF2TCategory');
     $this->addFieldMapping('rpd_institutions', 'institutions')
-      ->arguments(array('source_type' => 'tid'))
+      ->arguments(array('source_type' => 'id'))
       ->sourceMigration('RPDInstitution');
     $this->addFieldMapping('rpd_investigators', 'investigators')
-      ->arguments(array('source_type' => 'tid'))
+      ->arguments(array('source_type' => 'id'))
       ->sourceMigration('RPDInvestigator');
     $this->addFieldMapping('rpd_funding_sources_us', 'us_funding_sources')
       ->arguments(array('source_type' => 'tid'))
@@ -415,7 +415,7 @@ class RPDProjectTypeMigration extends Migration {
 }
 
 /**
- * Migrates records from the institution_data table into Institution terms.
+ * Migrates records from the institution_data table into Institution entities.
  */
 class RPDInstitutionMigration extends Migration {
   /**
@@ -425,6 +425,8 @@ class RPDInstitutionMigration extends Migration {
 
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $this->description = 'Migrates institution data into institution entities';
+
     $query = db_select('institution_data', 'i')
       ->fields('i', array('ID', 'INSTITUTION_NAME', 'INSTITUTION_DEPARTMENT', 'INSTITUTION_ADDRESS1', 'INSTITUTION_ADDRESS2', 'INSTITUTION_CITY', 'INSTITUTION_ZIP', 'INSTITUTION_URL'));
     $query->leftJoin('states', 's', 'i.INSTITUTION_STATE = s.id');
@@ -433,7 +435,7 @@ class RPDInstitutionMigration extends Migration {
     $query->fields('c', array('COUNTRY_NAME'))
       ->orderBy('ID', 'ASC');
     $this->source = new MigrateSourceSQL($query);
-    $this->destination = new MigrateDestinationTerm('rpd_institutions');
+    $this->destination = new MigrateDestinationEntityAPI('rpd_institution', 'rpd_institution');
 
     // Instantiate the MigrateMap.
     $this->map = new MigrateSQLMap($this->machineName,
@@ -445,7 +447,7 @@ class RPDInstitutionMigration extends Migration {
           'alias' => 'i',
         ),
       ),
-      MigrateDestinationTerm::getKeySchema()
+      MigrateDestinationEntityAPI::getKeySchema('rpd_institution')
     );
 
     // Get the country list from the Locale module.
@@ -453,7 +455,7 @@ class RPDInstitutionMigration extends Migration {
     $this->countries = country_get_list();
 
     // Add field mappings.
-    $this->addFieldMapping('name', 'INSTITUTION_NAME');
+    $this->addFieldMapping('title', 'INSTITUTION_NAME');
     $arguments = array(
       'organisation_name' => array('source_field' => 'INSTITUTION_DEPARTMENT'),
       'thoroughfare' => array('source_field' => 'INSTITUTION_ADDRESS1'),
@@ -468,6 +470,8 @@ class RPDInstitutionMigration extends Migration {
     $this->addFieldMapping('rpd_inst_url', 'INSTITUTION_URL');
     $this->addFieldMapping('rpd_inst_url:title')
       ->defaultValue('');
+    $this->addFieldMapping('rpd_inst_url:language')
+      ->defaultValue(LANGUAGE_NONE);
   }
 
   /**
@@ -488,15 +492,18 @@ class RPDInstitutionMigration extends Migration {
 }
 
 /**
- * Migrates records from the investigator_data table into Investigator terms.
+ * Migrates records from the investigator_data table into Investigator entities.
  */
 class RPDInvestigatorMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $this->dependencies = array('RPDInstitution');
+    $this->description = 'Migrates records in the investigator_data table to RPD Investigator entities.';
+
     $query = db_select('investigator_data', 'i')
-      ->fields('i', array('ID', 'name', 'EMAIL_ADDRESS', 'PHONE_NUMBER', 'INSTITUTION', 'ACTIVITY_STATUS'));
+      ->fields('i', array('ID', 'name', 'EMAIL_ADDRESS', 'PHONE_NUMBER', 'INSTITUTION'));
     $this->source = new MigrateSourceSQL($query);
-    $this->destination = new MigrateDestinationTerm('rpd_investigators');
+    $this->destination = new MigrateDestinationEntityAPI('rpd_investigator', 'rpd_investigator');
 
     // Instantiate the MigrateMap.
     $this->map = new MigrateSQLMap($this->machineName,
@@ -508,17 +515,16 @@ class RPDInvestigatorMigration extends Migration {
           'alias' => 'i',
         ),
       ),
-      MigrateDestinationTerm::getKeySchema()
+      MigrateDestinationEntityAPI::getKeySchema('rpd_investigator')
     );
 
     // Add field mappings.
-    $this->addFieldMapping('name', 'name');
+    $this->addFieldMapping('title', 'name');
     $this->addFieldMapping('rpd_inv_email', 'EMAIL_ADDRESS');
     $this->addFieldMapping('rpd_inv_phone', 'PHONE_NUMBER');
     $this->addFieldMapping('rpd_inv_institution', 'INSTITUTION')
-      ->arguments(array('source_type' => 'tid'))
+      ->arguments(array('source_type' => 'id'))
       ->sourceMigration('RPDInstitution');
-    $this->addFieldMapping('rpd_inv_activity_status', 'ACTIVITY_STATUS');
   }
 }
 

@@ -14,7 +14,6 @@ function migrate_rpd_migrate_api() {
       'RPDProject' => array('class_name' => 'RPDProjectMigration'),
       'RPDFSCategory' => array('class_name' => 'RPDFSCategoryMigration'),
       'RPDF2TCategory' => array('class_name' => 'RPDF2TCategoryMigration'),
-      'RPDJIFSRCategory' => array('class_name' => 'RPDJIFSRCategoryMigration'),
       'RPDActivityStatus' => array('class_name' => 'RPDActivityStatusMigration'),
       'RPDProjectType' => array('class_name' => 'RPDProjectTypeMigration'),
       'RPDInstitution' => array('class_name' => 'RPDInstitutionMigration'),

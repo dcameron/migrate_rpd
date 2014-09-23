@@ -16,7 +16,7 @@ class RPDProjectMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
     $query = db_select('project', 'p')
-      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'JIFSR_CATEGORIES', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_COOPORATORS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'ACTIVITY_STATUS', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE', 'LAST_UPDATE_BY'))
+      ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_COOPORATORS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'ACTIVITY_STATUS', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE', 'LAST_UPDATE_BY'))
     // @todo Remove the query range which limits the number of records during
     // testing.
       ->range(0, 250);
@@ -55,10 +55,6 @@ class RPDProjectMigration extends Migration {
     $this->addFieldMapping('rpd_fscats', 'category')
       ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDFSCategory')
-      ->defaultValue(0);
-    $this->addFieldMapping('rpd_jifsrcats', 'JIFSR_CATEGORIES')
-      ->arguments(array('source_type' => 'tid'))
-      ->sourceMigration('RPDJIFSRCategory')
       ->defaultValue(0);
     $this->addFieldMapping('rpd_project_type', 'PROJECT_TYPE')
       ->arguments(array('source_type' => 'tid'))
@@ -307,39 +303,6 @@ class RPDF2TCategoryMigration extends Migration {
 
     // Add field mappings.
     $this->addFieldMapping('name', 'name');
-    $this->addFieldMapping('description')
-      ->defaultValue('');
-    $this->addFieldMapping('format')
-      ->defaultValue('filtered_html');
-  }
-}
-
-/**
- * Migrates records from the jifsrcategory table into JIFSR category terms.
- */
-class RPDJIFSRCategoryMigration extends Migration {
-  public function __construct() {
-    parent::__construct(MigrateGroup::getInstance('rpdproject'));
-    $query = db_select('jifsrcategory', 'c')
-      ->fields('c', array('ID', 'CATEGORY_NAME'))
-      ->orderBy('ID', 'ASC');
-    $this->source = new MigrateSourceSQL($query);
-    $this->destination = new MigrateDestinationTerm('rpd_jifsr_categories');
-
-    // Instantiate the MigrateMap.
-    $this->map = new MigrateSQLMap($this->machineName,
-      array(
-        'ID' => array(
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-        ),
-      ),
-      MigrateDestinationTerm::getKeySchema()
-    );
-
-    // Add field mappings.
-    $this->addFieldMapping('name', 'CATEGORY_NAME');
     $this->addFieldMapping('description')
       ->defaultValue('');
     $this->addFieldMapping('format')

@@ -15,6 +15,7 @@ class RPDProjectMigration extends Migration {
 
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $this->dependencies = array('RPDFSCategory', 'RPDF2TCategory', 'RPDActivityStatus', 'RPDProjectType', 'RPDInstitution', 'RPDInvestigator', 'RPDUSFundingSource', 'RPDIntlFundingSource', 'RPDStateFundingSource');
     $query = db_select('project', 'p')
       ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_COOPORATORS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'ACTIVITY_STATUS', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE', 'LAST_UPDATE_BY'))
     // @todo Remove the query range which limits the number of records during

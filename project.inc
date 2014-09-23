@@ -16,6 +16,8 @@ class RPDProjectMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
     $this->dependencies = array('RPDFSCategory', 'RPDF2TCategory', 'RPDActivityStatus', 'RPDProjectType', 'RPDInstitution', 'RPDInvestigator', 'RPDUSFundingSource', 'RPDIntlFundingSource', 'RPDStateFundingSource');
+    $this->description = 'Migrates records in the project table to Research project nodes.';
+
     $query = db_select('project', 'p')
       ->fields('p', array('ID', 'PROJECT_NUMBER', 'PROJECT_TITLE', 'PROJECT_START_DATE', 'PROJECT_END_DATE', 'PROJECT_FUNDING', 'PROJECT_TYPE', 'PROJECT_KEYWORDS', 'PROJECT_IDENTIFIERS', 'PROJECT_COOPORATORS', 'PROJECT_ABSTRACT', 'PROJECT_PUBLICATIONS', 'PROJECT_MORE_INFO', 'PROJECT_OBJECTIVE', 'PROJECT_ACCESSION_NUMBER', 'ACTIVITY_STATUS', 'DATE_ENTERED', 'COMMENTS', 'LAST_UPDATE', 'LAST_UPDATE_BY'))
     // @todo Remove the query range which limits the number of records during
@@ -245,6 +247,8 @@ class RPDProjectMigration extends Migration {
 class RPDFSCategoryMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $this->description = 'Migrates records in the category table to RPD Food safety category taxonomy terms.';
+
     $query = db_select('category', 'c')
       ->fields('c', array('ID', 'CATEGORY_NAME', 'KEYWORDS', 'IDENTIFIERS', 'CATEGORY_DESCRIPTION'))
       ->orderBy('ID', 'ASC');
@@ -284,6 +288,8 @@ class RPDFSCategoryMigration extends Migration {
 class RPDF2TCategoryMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $this->description = 'Migrates records in the farm_to_table_categories table to RPD Farm to table category taxonomy terms.';
+
     $query = db_select('farm_to_table_categories', 'c')
       ->fields('c', array('cid', 'name'))
       ->orderBy('cid', 'ASC');
@@ -352,6 +358,8 @@ class RPDActivityStatusMigration extends Migration {
 class RPDProjectTypeMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $this->description = 'Migrates records in the projecttype table to RPD Project type taxonomy terms.';
+
     $query = db_select('projecttype', 't')
       ->fields('t', array('ID', 'NAME', 'COMMENTS'))
       ->orderBy('ID', 'ASC');
@@ -498,6 +506,8 @@ class RPDInvestigatorMigration extends Migration {
 class RPDUSFundingSourceMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $this->description = 'Migrates records in the agency_data table to RPD US Funding Source taxonomy terms.';
+
     $query = db_select('agency_data', 'a')
       ->fields('a', array('ID', 'AGENCY_FULL_NAME', 'AGENCY_ACRONYM', 'AGENCY_URL'))
       ->condition('US_GOVT', 1)
@@ -537,6 +547,8 @@ class RPDUSFundingSourceMigration extends Migration {
 class RPDIntlFundingSourceMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $this->description = 'Migrates records in the agency_data table to RPD Intl. funding source taxonomy terms.';
+
     $query = db_select('agency_data', 'a')
       ->fields('a', array('ID', 'AGENCY_FULL_NAME', 'AGENCY_ACRONYM', 'AGENCY_URL'))
       ->condition('US_GOVT', 2)
@@ -576,6 +588,8 @@ class RPDIntlFundingSourceMigration extends Migration {
 class RPDStateFundingSourceMigration extends Migration {
   public function __construct() {
     parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $this->description = 'Migrates records in the agency_data table to RPD State funding source taxonomy terms.';
+
     $query = db_select('agency_data', 'a')
       ->fields('a', array('ID', 'AGENCY_FULL_NAME', 'AGENCY_ACRONYM', 'AGENCY_URL'))
       ->condition('US_GOVT', 0)

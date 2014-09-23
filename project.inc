@@ -97,9 +97,9 @@ class RPDProjectMigration extends Migration {
     $this->addFieldMapping('rpd_accession_number', 'PROJECT_ACCESSION_NUMBER')
       ->arguments(array('format' => 'plain_text'))
       ->defaultValue('');
-    $this->addFieldMapping('rpd_activity_status', 'ACTIVITY_STATUS');
-    $this->addFieldMapping('body:format')
-      ->defaultValue('filtered_html');
+    $this->addFieldMapping('rpd_activity_status', 'ACTIVITY_STATUS')
+      ->arguments(array('source_type' => 'tid'))
+      ->sourceMigration('RPDActivityStatus');
     $this->addFieldMapping('created', 'DATE_ENTERED')
       ->callbacks('strtotime');
     $this->addFieldMapping('rpd_comments', 'COMMENTS')
@@ -340,6 +340,41 @@ class RPDJIFSRCategoryMigration extends Migration {
 
     // Add field mappings.
     $this->addFieldMapping('name', 'CATEGORY_NAME');
+    $this->addFieldMapping('description')
+      ->defaultValue('');
+    $this->addFieldMapping('format')
+      ->defaultValue('filtered_html');
+  }
+}
+
+/**
+ * Migrates records from the status table into Activity status terms.
+ */
+class RPDActivityStatusMigration extends Migration {
+  public function __construct() {
+    parent::__construct(MigrateGroup::getInstance('rpdproject'));
+    $this->description = 'Migrates records in the status table to RPD Activity status taxonomy terms.';
+
+    $query = db_select('status', 's')
+      ->fields('s', array('ID', 'TEXT'))
+      ->orderBy('ID', 'ASC');
+    $this->source = new MigrateSourceSQL($query);
+    $this->destination = new MigrateDestinationTerm('rpd_activity_statuses');
+
+    // Instantiate the MigrateMap.
+    $this->map = new MigrateSQLMap($this->machineName,
+      array(
+        'ID' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+      ),
+      MigrateDestinationTerm::getKeySchema()
+    );
+
+    // Add field mappings.
+    $this->addFieldMapping('name', 'TEXT');
     $this->addFieldMapping('description')
       ->defaultValue('');
     $this->addFieldMapping('format')

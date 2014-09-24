@@ -50,80 +50,127 @@ class RPDProjectMigration extends Migration {
     $this->addFieldMapping('uid', 'LAST_UPDATE_BY')
       ->defaultValue(1)
       ->callbacks(array($this, 'getUID'));
-    $this->addFieldMapping('rpd_project_number', 'PROJECT_NUMBER')
-      ->arguments(array('format' => 'plain_text'));
+    $this->addFieldMapping('comment')
+      ->defaultValue(1);
+    $this->addFieldMapping('status')
+      ->defaultValue(1);
+    $this->addFieldMapping('promote')
+      ->defaultValue(0);
+    $this->addFieldMapping('sticky')
+      ->defaultValue(0);
+    $this->addFieldMapping('language')
+      ->defaultValue(LANGUAGE_NONE);
+    $this->addFieldMapping('tnid')
+      ->defaultValue(0);
+    $this->addFieldMapping('translate')
+      ->defaultValue(0);
+    $this->addFieldMapping('rpd_project_number', 'PROJECT_NUMBER');
+    $this->addFieldMapping('rpd_project_number:format')
+      ->defaultValue('plain_text');
+    $this->addFieldMapping('rpd_project_number:language')
+      ->defaultValue(LANGUAGE_NONE);
     $this->addFieldMapping('rpd_start_date', 'PROJECT_START_DATE');
     $this->addFieldMapping('rpd_end_date', 'PROJECT_END_DATE');
     $this->addFieldMapping('rpd_funding', 'PROJECT_FUNDING');
     $this->addFieldMapping('rpd_fscats', 'category')
-      ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDFSCategory')
       ->defaultValue(0);
+    $this->addFieldMapping('rpd_fscats:source_type')
+      ->defaultValue('tid');
     $this->addFieldMapping('rpd_project_type', 'PROJECT_TYPE')
-      ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDProjectType')
       ->defaultValue(0);
+    $this->addFieldMapping('rpd_project_type:source_type')
+      ->defaultValue('tid');
     $this->addFieldMapping('rpd_keywords', 'PROJECT_KEYWORDS')
-      ->arguments(array('format' => 'plain_text'))
       ->defaultValue('');
+    $this->addFieldMapping('rpd_keywords:format')
+      ->defaultValue('plain_text');
+    $this->addFieldMapping('rpd_keywords:language')
+      ->defaultValue(LANGUAGE_NONE);
     $this->addFieldMapping('rpd_identifiers', 'PROJECT_IDENTIFIERS')
-      ->arguments(array('format' => 'plain_text'))
       ->defaultValue('');
+    $this->addFieldMapping('rpd_identifiers:format')
+      ->defaultValue('plain_text');
+    $this->addFieldMapping('rpd_identifiers:language')
+      ->defaultValue(LANGUAGE_NONE);
     $this->addFieldMapping('rpd_cooperators', 'PROJECT_COOPORATORS')
-      ->arguments(array('format' => 'plain_text'))
       ->defaultValue('')
       ->callbacks(array($this, 'splitCooperators'));
+    $this->addFieldMapping('rpd_cooperators:format')
+      ->defaultValue('plain_text');
+    $this->addFieldMapping('rpd_cooperators:language')
+      ->defaultValue(LANGUAGE_NONE);
     $this->addFieldMapping('rpd_abstract', 'PROJECT_ABSTRACT')
       ->defaultValue('')
       ->callbacks('html_entity_decode', 'utf8_encode');
     $this->addFieldMapping('rpd_abstract:format')
       ->defaultValue('filtered_html');
+    $this->addFieldMapping('rpd_abstract:language')
+      ->defaultValue(LANGUAGE_NONE);
     $this->addFieldMapping('rpd_publications', 'PROJECT_PUBLICATIONS')
       ->defaultValue('')
       ->callbacks(array($this, 'splitPublications'));
     $this->addFieldMapping('rpd_publications:format')
       ->defaultValue('filtered_html');
+    $this->addFieldMapping('rpd_publications:language')
+      ->defaultValue(LANGUAGE_NONE);
     $this->addFieldMapping('rpd_more_info', 'PROJECT_MORE_INFO')
       ->defaultValue('')
       ->callbacks('html_entity_decode', 'utf8_encode');
     $this->addFieldMapping('rpd_more_info:format')
       ->defaultValue('filtered_html');
+    $this->addFieldMapping('rpd_more_info:language')
+      ->defaultValue(LANGUAGE_NONE);
     $this->addFieldMapping('body', 'PROJECT_OBJECTIVE')
       ->defaultValue('')
       ->callbacks('html_entity_decode', 'utf8_encode');
     $this->addFieldMapping('body:summary')
       ->defaultValue('');
+    $this->addFieldMapping('body:format')
+      ->defaultValue('filtered_html');
+    $this->addFieldMapping('body:language')
+      ->defaultValue(LANGUAGE_NONE);
     $this->addFieldMapping('rpd_accession_number', 'PROJECT_ACCESSION_NUMBER')
-      ->arguments(array('format' => 'plain_text'))
       ->defaultValue('');
+    $this->addFieldMapping('rpd_accession_number:format')
+      ->defaultValue('plain_text');
+    $this->addFieldMapping('rpd_accession_number:language')
+      ->defaultValue(LANGUAGE_NONE);
     $this->addFieldMapping('rpd_activity_status', 'ACTIVITY_STATUS')
-      ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDActivityStatus');
+    $this->addFieldMapping('rpd_activity_status:source_type')
+      ->defaultValue('tid');
     $this->addFieldMapping('created', 'DATE_ENTERED')
       ->callbacks('strtotime');
     $this->addFieldMapping('rpd_comments', 'COMMENTS')
-      ->arguments(array('format' => 'plain_text'))
       ->defaultValue('');
+    $this->addFieldMapping('rpd_comments:format')
+      ->defaultValue('plain_text');
+    $this->addFieldMapping('rpd_comments:language')
+      ->defaultValue(LANGUAGE_NONE);
     $this->addFieldMapping('changed', 'LAST_UPDATE')
       ->callbacks('strtotime');
     $this->addFieldMapping('rpd_f2tcats', 'farm_to_table')
-      ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDF2TCategory');
+    $this->addFieldMapping('rpd_f2tcats:source_type')
+      ->defaultValue('tid');
     $this->addFieldMapping('rpd_institutions', 'institutions')
-      ->arguments(array('source_type' => 'id'))
       ->sourceMigration('RPDInstitution');
     $this->addFieldMapping('rpd_investigators', 'investigators')
-      ->arguments(array('source_type' => 'id'))
       ->sourceMigration('RPDInvestigator');
     $this->addFieldMapping('rpd_funding_sources_us', 'us_funding_sources')
-      ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDUSFundingSource');
+    $this->addFieldMapping('rpd_funding_sources_us:source_type')
+      ->defaultValue('tid');
     $this->addFieldMapping('rpd_funding_sources_intl', 'intl_funding_sources')
-      ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDIntlFundingSource');
+    $this->addFieldMapping('rpd_funding_sources_intl:source_type')
+      ->defaultValue('tid');
     $this->addFieldMapping('rpd_funding_sources_state', 'state_funding_sources')
-      ->arguments(array('source_type' => 'tid'))
       ->sourceMigration('RPDStateFundingSource');
+    $this->addFieldMapping('rpd_funding_sources_state:source_type')
+      ->defaultValue('tid');
   }
 
   public function prepareRow($row) {
@@ -271,14 +318,24 @@ class RPDFSCategoryMigration extends Migration {
     $this->addFieldMapping('name', 'CATEGORY_NAME')
       ->callbacks('html_entity_decode');
     $this->addFieldMapping('description', 'CATEGORY_DESCRIPTION');
+    $this->addFieldMapping('parent')
+      ->defaultValue(0);
     $this->addFieldMapping('format')
       ->defaultValue('filtered_html');
+    $this->addFieldMapping('weight')
+      ->defaultValue(0);
     $this->addFieldMapping('rpd_fscat_keywords', 'KEYWORDS')
-      ->arguments(array('format' => 'plain_text'))
       ->defaultValue('');
+    $this->addFieldMapping('rpd_fscat_keywords:format')
+      ->defaultValue('plain_text');
+    $this->addFieldMapping('rpd_fscat_keywords:language')
+      ->defaultValue(LANGUAGE_NONE);
     $this->addFieldMapping('rpd_fscat_identifiers', 'IDENTIFIERS')
-      ->arguments(array('format' => 'plain_text'))
       ->defaultValue('');
+    $this->addFieldMapping('rpd_fscat_identifiers:format')
+      ->defaultValue('plain_text');
+    $this->addFieldMapping('rpd_fscat_identifiers:language')
+      ->defaultValue(LANGUAGE_NONE);
   }
 }
 
@@ -312,8 +369,12 @@ class RPDF2TCategoryMigration extends Migration {
     $this->addFieldMapping('name', 'name');
     $this->addFieldMapping('description')
       ->defaultValue('');
+    $this->addFieldMapping('parent')
+      ->defaultValue(0);
     $this->addFieldMapping('format')
       ->defaultValue('filtered_html');
+    $this->addFieldMapping('weight')
+      ->defaultValue(0);
   }
 }
 
@@ -347,8 +408,12 @@ class RPDActivityStatusMigration extends Migration {
     $this->addFieldMapping('name', 'TEXT');
     $this->addFieldMapping('description')
       ->defaultValue('');
+    $this->addFieldMapping('parent')
+      ->defaultValue(0);
     $this->addFieldMapping('format')
       ->defaultValue('filtered_html');
+    $this->addFieldMapping('weight')
+      ->defaultValue(0);
   }
 }
 
@@ -381,8 +446,12 @@ class RPDProjectTypeMigration extends Migration {
     // Add field mappings.
     $this->addFieldMapping('name', 'NAME');
     $this->addFieldMapping('description', 'COMMENTS');
+    $this->addFieldMapping('parent')
+      ->defaultValue(0);
     $this->addFieldMapping('format')
       ->defaultValue('filtered_html');
+    $this->addFieldMapping('weight')
+      ->defaultValue(0);
   }
 }
 
@@ -427,7 +496,15 @@ class RPDInstitutionMigration extends Migration {
     $this->countries = country_get_list();
 
     // Add field mappings.
+    $this->addFieldMapping('type')
+      ->defaultValue('rpd_institution');
     $this->addFieldMapping('title', 'INSTITUTION_NAME');
+    $this->addFieldMapping('uid')
+      ->defaultValue(1);
+    $this->addFieldMapping('created')
+      ->defaultValue(time());
+    $this->addFieldMapping('changed')
+      ->defaultValue(time());
     $arguments = array(
       'organisation_name' => array('source_field' => 'INSTITUTION_DEPARTMENT'),
       'thoroughfare' => array('source_field' => 'INSTITUTION_ADDRESS1'),
@@ -491,11 +568,18 @@ class RPDInvestigatorMigration extends Migration {
     );
 
     // Add field mappings.
+    $this->addFieldMapping('type')
+      ->defaultValue('rpd_investigator');
     $this->addFieldMapping('title', 'name');
+    $this->addFieldMapping('uid')
+      ->defaultValue(1);
+    $this->addFieldMapping('created')
+      ->defaultValue(time());
+    $this->addFieldMapping('changed')
+      ->defaultValue(time());
     $this->addFieldMapping('rpd_inv_email', 'EMAIL_ADDRESS');
     $this->addFieldMapping('rpd_inv_phone', 'PHONE_NUMBER');
     $this->addFieldMapping('rpd_inv_institution', 'INSTITUTION')
-      ->arguments(array('source_type' => 'id'))
       ->sourceMigration('RPDInstitution');
   }
 }
@@ -532,12 +616,22 @@ class RPDUSFundingSourceMigration extends Migration {
 
     // Add field mappings.
     $this->addFieldMapping('name', 'AGENCY_FULL_NAME');
+    $this->addFieldMapping('description')
+      ->defaultValue('');
     $this->addFieldMapping('parent', 'parent')
       ->sourceMigration('RPDUSFundingSource');
+    $this->addFieldMapping('format')
+      ->defaultValue('filtered_html');
+    $this->addFieldMapping('weight')
+      ->defaultValue(0);
     $this->addFieldMapping('rpd_funding_acronym', 'AGENCY_ACRONYM');
+    $this->addFieldMapping('rpd_funding_acronym:language')
+      ->defaultValue(LANGUAGE_NONE);
     $this->addFieldMapping('rpd_funding_url', 'AGENCY_URL');
     $this->addFieldMapping('rpd_funding_url:title')
       ->defaultValue('');
+    $this->addFieldMapping('rpd_funding_url:language')
+      ->defaultValue(LANGUAGE_NONE);
   }
 }
 
@@ -573,12 +667,22 @@ class RPDIntlFundingSourceMigration extends Migration {
 
     // Add field mappings.
     $this->addFieldMapping('name', 'AGENCY_FULL_NAME');
+    $this->addFieldMapping('description')
+      ->defaultValue('');
     $this->addFieldMapping('parent', 'parent')
       ->sourceMigration('RPDIntlFundingSource');
+    $this->addFieldMapping('format')
+      ->defaultValue('filtered_html');
+    $this->addFieldMapping('weight')
+      ->defaultValue(0);
     $this->addFieldMapping('rpd_funding_acronym', 'AGENCY_ACRONYM');
+    $this->addFieldMapping('rpd_funding_acronym:language')
+      ->defaultValue(LANGUAGE_NONE);
     $this->addFieldMapping('rpd_funding_url', 'AGENCY_URL');
     $this->addFieldMapping('rpd_funding_url:title')
       ->defaultValue('');
+    $this->addFieldMapping('rpd_funding_url:language')
+      ->defaultValue(LANGUAGE_NONE);
   }
 }
 
@@ -614,11 +718,21 @@ class RPDStateFundingSourceMigration extends Migration {
 
     // Add field mappings.
     $this->addFieldMapping('name', 'AGENCY_FULL_NAME');
+    $this->addFieldMapping('description')
+      ->defaultValue('');
     $this->addFieldMapping('parent', 'parent')
       ->sourceMigration('RPDStateFundingSource');
+    $this->addFieldMapping('format')
+      ->defaultValue('filtered_html');
+    $this->addFieldMapping('weight')
+      ->defaultValue(0);
     $this->addFieldMapping('rpd_funding_acronym', 'AGENCY_ACRONYM');
+    $this->addFieldMapping('rpd_funding_acronym:language')
+      ->defaultValue(LANGUAGE_NONE);
     $this->addFieldMapping('rpd_funding_url', 'AGENCY_URL');
     $this->addFieldMapping('rpd_funding_url:title')
       ->defaultValue('');
+    $this->addFieldMapping('rpd_funding_url:language')
+      ->defaultValue(LANGUAGE_NONE);
   }
 }

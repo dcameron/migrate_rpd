@@ -10,17 +10,53 @@
 function migrate_rpd_migrate_api() {
   $api = array(
     'api' => 2,
+    'groups' => array(
+      'rpd' => array(
+        'title' => t('Research projects content'),
+        'default_format' => 'filtered_html',
+      ),
+    ),
     'migrations' => array(
-      'RPDProject' => array('class_name' => 'RPDProjectMigration'),
-      'RPDFSCategory' => array('class_name' => 'RPDFSCategoryMigration'),
-      'RPDF2TCategory' => array('class_name' => 'RPDF2TCategoryMigration'),
-      'RPDActivityStatus' => array('class_name' => 'RPDActivityStatusMigration'),
-      'RPDProjectType' => array('class_name' => 'RPDProjectTypeMigration'),
-      'RPDInstitution' => array('class_name' => 'RPDInstitutionMigration'),
-      'RPDInvestigator' => array('class_name' => 'RPDInvestigatorMigration'),
-      'RPDUSFundingSource' => array('class_name' => 'RPDUSFundingSourceMigration'),
-      'RPDIntlFundingSource' => array('class_name' => 'RPDIntlFundingSourceMigration'),
-      'RPDStateFundingSource' => array('class_name' => 'RPDStateFundingSourceMigration'),
+      'Project' => array(
+        'class_name' => 'RpdProjectMigration',
+        'group_name' => 'rpd',
+      ),
+      'FSCategory' => array(
+        'class_name' => 'RpdFSCategoryMigration',
+        'group_name' => 'rpd',
+      ),
+      'F2TCategory' => array(
+        'class_name' => 'RpdF2TCategoryMigration',
+        'group_name' => 'rpd',
+      ),
+      'ActivityStatus' => array(
+        'class_name' => 'RpdActivityStatusMigration',
+        'group_name' => 'rpd',
+      ),
+      'ProjectType' => array(
+        'class_name' => 'RpdProjectTypeMigration',
+        'group_name' => 'rpd',
+      ),
+      'Institution' => array(
+        'class_name' => 'RpdInstitutionMigration',
+        'group_name' => 'rpd',
+      ),
+      'Investigator' => array(
+        'class_name' => 'RpdInvestigatorMigration',
+        'group_name' => 'rpd',
+      ),
+      'USFundingSource' => array(
+        'class_name' => 'RpdUSFundingSourceMigration',
+        'group_name' => 'rpd',
+      ),
+      'IntlFundingSource' => array(
+        'class_name' => 'RpdIntlFundingSourceMigration',
+        'group_name' => 'rpd',
+      ),
+      'StateFundingSource' => array(
+        'class_name' => 'RpdStateFundingSourceMigration',
+        'group_name' => 'rpd',
+      ),
     ),
   );
   return $api;

@@ -12,4 +12,13 @@ dependencies[] = text
 dependencies[] = views
 
 files[] = migrate_rpd.migrate.inc
-files[] = project.inc
+files[] = RpdActivityStatusMigration.php
+files[] = RpdF2TCategoryMigration.php
+files[] = RpdFSCategoryMigration.php
+files[] = RpdInstitutionMigration.php
+files[] = RpdIntlFundingSourceMigration.php
+files[] = RpdInvestigatorMigration.php
+files[] = RpdProjectMigration.php
+files[] = RpdProjectTypeMigration.php
+files[] = RpdStateFundingSourceMigration.php
+files[] = RpdUSFundingSourceMigration.php

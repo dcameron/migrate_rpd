@@ -234,6 +234,14 @@ class RpdProjectMigration extends Migration {
       ->fetchCol();
 
     db_set_active();
+
+    // Remove dates that are equal to 0.
+    if ($row->PROJECT_START_DATE === '0') {
+      $row->PROJECT_START_DATE = array();
+    }
+    if ($row->PROJECT_END_DATE === '0') {
+      $row->PROJECT_END_DATE = array();
+    }
   }
 
   /**
